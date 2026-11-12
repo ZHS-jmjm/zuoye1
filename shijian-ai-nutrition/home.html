@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>主页 · 食鉴 AI 营养分析师</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥗</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/scroll.css">
+  <style>
+    /* 区块3：今日餐食记录（横向卡片 + 空状态） */
+    .meal-card {
+      min-width: 250px; background: #fff; border: 1px solid var(--line);
+      border-radius: 16px; box-shadow: var(--shadow); padding: 16px 18px;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .meal-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(16,185,129,.16); }
+    .meal-card-top { display: flex; align-items: center; gap: 12px; }
+    .meal-card-icon { font-size: 26px; }
+    .meal-card-name { font-weight: 700; color: var(--ink); font-size: 15px; }
+    .meal-card-meta { font-size: 12px; color: var(--ink-2); margin-top: 2px; }
+    .meal-card-kcal { margin-top: 12px; font-size: 20px; font-weight: 700; color: var(--green-600); }
+    .meal-card-kcal small { font-size: 12px; font-weight: 600; color: var(--ink-2); }
+    .meals-empty {
+      border: 2px dashed #d1fae5; background: rgba(255, 255, 255, .7);
+      border-radius: 16px; padding: 48px 20px; text-align: center;
+    }
+    .meals-empty .me-icon { font-size: 52px; line-height: 1; margin-bottom: 12px; }
+    .meals-empty p { font-size: 15px; color: var(--ink-2); }
+    .meals-empty .me-sub { font-size: 13px; color: #9ca3af; margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+  <!-- ============ 顶部导航（固定） ============ -->
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a class="logo" href="home.html">
+        <span class="logo-icon">🥗</span>
+        <span class="logo-text">食鉴 <em>AI 营养分析师</em></span>
+      </a>
+      <nav class="nav-links">
+        <a href="home.html">首页</a>
+        <a href="nutrition.html">AI 营养师</a>
+        <a href="chat.html">营养师对话</a>
+        <a href="tracker.html">今日摄入</a>
+        <a href="exercise.html">运动中心</a>
+        <a href="faq.html">常见问题</a>
+      </nav>
+      <div class="nav-user" id="nav-user"></div>
+    </div>
+  </header>
+
+  <!-- ============ 三栏：左侧卡片 / 中间主内容 / 右侧卡片 ============ -->
+  <div class="home-shell">
+
+    <aside class="home-side home-side-left" aria-label="今日打卡与营养贴士">
+      <!-- 饮水打卡 -->
+      <section class="side-card">
+        <div class="side-card-head"><span class="side-ico">💧</span><h3>饮水打卡</h3></div>
+        <p class="water-num"><b id="water-now">1200</b><small> / 2000 ml</small></p>
+        <div class="water-bar"><i id="water-fill"></i></div>
+        <button class="water-add" id="water-add" type="button">＋ 记一杯 200ml</button>
+      </section>
+
+      <!-- 每日营养小贴士 -->
+      <section class="side-card">
+        <div class="side-card-head"><span class="side-ico">🍃</span><h3>每日营养小贴士</h3></div>
+        <p class="side-tip">深色蔬菜的叶酸与膳食纤维更丰富，每餐蔬菜至少一半选深色，控糖又顶饱。</p>
+      </section>
+    </aside>
+
+  <!-- ============ 独立吸附滚动容器 ============ -->
+  <main class="page-scroll" id="pageScroll">
+
+    <!-- 区块1：欢迎 Banner + 开始分析一餐按钮 -->
+    <section class="snap-block home-hero" data-block-name="欢迎页">
+      <img class="banner-deco" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=overhead%20spread%20of%20fresh%20healthy%20dishes%2C%20green%20salad%20bowls%2C%20oat%20grains%2C%20kiwi%20and%20leafy%20greens%20on%20a%20pale%20mint%20table%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=landscape_16_9" alt="">
+      <div class="container">
+        <h1 id="welcome-title">你好，欢迎回来 👋</h1>
+        <p class="home-hero-sub">今天想吃什么？拍下来，让 AI 营养师帮你算一算。</p>
+        <a href="nutrition.html#analyzer" class="btn btn-primary">🚀 开始分析一餐</a>
+      </div>
+    </section>
+
+    <!-- 区块2：今日概览 4 个营养数据卡片 -->
+    <section class="snap-block section" data-block-name="今日概览">
+      <div class="container" style="position: relative; overflow: hidden;">
+        <img class="corner-deco tr" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=top-down%20flat%20lay%20of%20fresh%20mint%20leaves%2C%20oats%2C%20almonds%20and%20green%20vegetables%20on%20pale%20linen%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=landscape_16_9" alt="">
+        <img class="corner-deco bl" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=top-down%20flat%20lay%20of%20fresh%20green%20bean%20sprouts%2C%20oat%20grains%2C%20avocado%20and%20leafy%20greens%20on%20pale%20mint%20linen%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=landscape_16_9" alt="">
+        <h2 class="section-title" style="position: relative; z-index: 1;">今日概览</h2>
+        <p class="section-desc" style="position: relative; z-index: 1;">数据实时同步自 MySQL 数据库，换浏览器也不丢。</p>
+
+        <div class="home-overview" style="position: relative; z-index: 1;">
+          <div class="ov-card ov-main">
+            <p class="ov-title">今日热量</p>
+            <p class="ov-num"><span id="ov-calorie">0</span><small> / <span id="ov-goal">2000</span> kcal</small></p>
+            <div class="ov-bar"><i id="ov-fill"></i></div>
+            <p class="ov-sync" id="ov-exercise" hidden></p>
+          </div>
+          <div class="ov-card"><p class="ov-title">蛋白质</p><p class="ov-macro" id="ov-protein">0g</p></div>
+          <div class="ov-card"><p class="ov-title">碳水</p><p class="ov-macro" id="ov-carb">0g</p></div>
+          <div class="ov-card"><p class="ov-title">脂肪</p><p class="ov-macro" id="ov-fat">0g</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 区块3：今日餐食记录横向卡片 -->
+    <section class="snap-block section" data-block-name="餐食记录">
+      <div class="container">
+        <h2 class="section-title">🍽️ 今日餐食记录</h2>
+        <p class="section-desc">横向滑动查看今天吃过的每一餐。</p>
+
+        <div class="hscroll" id="rec-meals"></div>
+
+        <div id="rec-meals-empty" hidden class="meals-empty">
+          <img class="me-photo" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20fresh%20green%20salad%20bowl%20with%20cucumber%20and%20lettuce%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=square" alt="沙拉">
+          <p>今天还没有记录，去分析第一餐吧。</p>
+          <p class="me-sub">点上面的「开始分析一餐」就可以开始～</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 区块4：功能导航网格卡片 + 页脚 -->
+    <section class="snap-block section section-alt" data-block-name="功能导航">
+      <div class="container">
+        <h2 class="section-title">功能导航</h2>
+        <div class="home-grid">
+          <a class="home-card" href="nutrition.html#analyzer">
+            <img src="image/hero-salad.jpg" alt="食物分析" loading="lazy">
+            <div class="home-card-body">
+              <strong>📷 AI 食物分析</strong>
+              <span>上传照片或描述餐食，秒出营养报告</span>
+            </div>
+          </a>
+          <a class="home-card" href="chat.html">
+            <img src="image/dumplings.jpg" alt="营养师对话" loading="lazy">
+            <div class="home-card-body">
+              <strong>💬 AI 营养师对话</strong>
+              <span>知道你今天吃了多少，建议更贴心</span>
+            </div>
+          </a>
+          <a class="home-card" href="tracker.html">
+            <img src="image/chicken-meal.jpg" alt="今日摄入" loading="lazy">
+            <div class="home-card-body">
+              <strong>📈 今日摄入追踪</strong>
+              <span>热量预算与三大营养素实时进度</span>
+            </div>
+          </a>
+          <a class="home-card" href="exercise.html">
+            <img src="image/veggies.jpg" alt="运动中心" loading="lazy">
+            <div class="home-card-body">
+              <strong>🏃 运动中心</strong>
+              <span>记录日常活动，消耗自动同步热量额度</span>
+            </div>
+          </a>
+        </div>
+
+        <footer class="footer">
+          <div class="container">
+            <p><strong>🥗 食鉴 · AI 营养分析师</strong> — AI 健康与生活服务主题参赛作品</p>
+            <p class="disclaimer">⚠️ 免责声明：所有营养分析均为 AI 估算，仅供参考，不构成医学诊断或治疗建议。</p>
+          </div>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+    <aside class="home-side home-side-right" aria-label="快捷问答与今日提醒">
+      <!-- 禾禾快捷问答 -->
+      <section class="side-card">
+        <div class="side-card-head">
+          <span class="side-avatar" aria-hidden="true">
+            <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+              <path d="M60 42 C60 32 60 27 60 21" stroke="#6fbf73" stroke-width="3.4" fill="none" stroke-linecap="round"/>
+              <path d="M60 24 C52 18 43 20 38 27 C47 30 56 29 60 24 Z" fill="#7cc97e"/>
+              <path d="M60 24 C68 18 77 20 82 27 C73 30 64 29 60 24 Z" fill="#8fd68f"/>
+              <ellipse cx="60" cy="72" rx="34" ry="32" fill="#ddf3dc" stroke="#8ccf8c" stroke-width="3"/>
+              <ellipse cx="48" cy="66" rx="4.6" ry="5.4" fill="#3f4a3f"/>
+              <ellipse cx="72" cy="66" rx="4.6" ry="5.4" fill="#3f4a3f"/>
+              <circle cx="40" cy="74" r="4.2" fill="#f6c6c6" opacity=".55"/>
+              <circle cx="80" cy="74" r="4.2" fill="#f6c6c6" opacity=".55"/>
+              <path d="M54 76 Q60 82 66 76" stroke="#4a5a4a" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <h3>禾禾快捷问答</h3>
+        </div>
+        <p class="side-sub">有问题，点一下直接问禾禾</p>
+        <div class="side-links">
+          <a href="chat.html">帮我搭配减脂餐</a>
+          <a href="chat.html">看看今天摄入是否超标</a>
+          <a href="chat.html">健身食谱推荐</a>
+        </div>
+      </section>
+
+      <!-- 今日提醒 -->
+      <section class="side-card">
+        <div class="side-card-head"><span class="side-ico">🔔</span><h3>今日提醒</h3></div>
+        <div class="side-remind">
+          <p class="side-remind-label">下一餐建议</p>
+          <p>晚餐：清蒸鱼 + 蒜蓉西兰花 + 半碗杂粮饭，约 520 kcal。</p>
+        </div>
+        <div class="side-remind">
+          <p class="side-remind-label">轻运动提醒</p>
+          <p>饭后散步 20 分钟，帮助平稳餐后血糖。</p>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <!-- 右侧圆点指示器 -->
+  <nav class="dots" id="dots" aria-label="页面区块导航"></nav>
+
+  <script src="js/auth.js"></script>
+  <script src="js/home.js"></script>
+  <script src="js/scroll-ui.js"></script>
+  <script src="js/global-ui.js"></script>
+</body>
+</html>

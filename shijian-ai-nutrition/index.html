@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 · 食鉴 AI 营养分析师</title>
+  <meta name="description" content="登录食鉴，开始你的 AI 健康饮食之旅">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥗</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="login-body">
+
+  <div class="login-wrap">
+    <!-- 底层：左侧绿色调食材图 -->
+    <aside class="login-brand">
+      <img src="image/green-food_1.jpg" alt="绿色调轻食" class="login-bg">
+      <div class="login-brand-inner">
+        <div class="brand-head">
+          <span class="login-logo">🥗</span>
+          <h2>食鉴</h2>
+        </div>
+        <p class="brand-sub">AI 营养分析师</p>
+        <p class="brand-tag">拍一拍，3 秒看懂这一餐的营养</p>
+      </div>
+    </aside>
+
+    <!-- 上层：右侧红色调食材图（左侧斜向渐变淡入，与绿图柔和交融） -->
+    <img src="image/red-food_1.jpg" alt="" class="login-bg-right">
+
+    <!-- 登录表单 -->
+    <main class="login-panel">
+      <div class="login-card">
+        <h1>欢迎回来 👋</h1>
+        <p class="login-sub">登录后继续你的健康饮食记录</p>
+
+        <form id="auth-form" novalidate>
+          <label class="field">
+            <span>用户名</span>
+            <input type="text" id="username" maxlength="20" autocomplete="username" placeholder="请输入用户名">
+          </label>
+          <label class="field">
+            <span>密码</span>
+            <input type="password" id="password" maxlength="30" autocomplete="current-password" placeholder="请输入密码">
+          </label>
+
+          <p class="form-error" id="form-error" role="alert" hidden></p>
+
+          <button type="submit" class="btn btn-primary btn-block" id="submit-btn">登 录</button>
+        </form>
+
+        <p class="login-switch">还没有账号？<a href="register.html">点此注册 →</a></p>
+      </div>
+
+      <!-- 演示账号提示（独立于登录卡，明确标注仅用于作品演示） -->
+      <div class="demo-box">
+        <span class="demo-tag">竞赛演示账号</span>
+        <p class="demo-line"><b>test</b> / <b>123456</b></p>
+        <p class="demo-note">仅用于作品演示，非生产账号</p>
+      </div>
+    </main>
+
+    <div class="login-footer">
+      <span>本作品为网页开发竞赛参赛作品，营养数据仅供参考。</span>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+  <script src="js/login.js"></script>
+  <script src="js/global-ui.js"></script>
+</body>
+</html>

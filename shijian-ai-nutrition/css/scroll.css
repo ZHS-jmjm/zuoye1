@@ -1,0 +1,45 @@
+/* ============================================================
+ * 全站统一的「果冻弹性分块滚动」
+ * 依赖：每页一个独立滚动容器 #pageScroll + 各一级区块 .snap-block
+ * 纯原生 CSS 实现，不引入 fullpage / gsap 等第三方滚动库
+ * ============================================================ */
+
+/* 顶部导航全局固定（吸附滚动页面上由 sticky 升级为 fixed） */
+.navbar { position: fixed; top: 0; left: 0; right: 0; }
+
+/* 页面外层滚动容器：每个页面独立一个，完全原生自由滚动 */
+.page-scroll {
+  height: 100vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;         /* 锚点 / 圆点跳转平滑 */
+  scroll-padding-top: 64px;        /* 跳转时给固定导航让位（导航高 60px） */
+  overscroll-behavior-y: contain;  /* 到顶 / 到底不牵动外部 */
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+  padding-top: 64px;               /* 固定导航占位 */
+  position: relative;
+}
+
+/* 内容区块：正常文档流，高度自适应内容 */
+.snap-block { scroll-snap-align: start; }
+
+/* 右侧小圆点导航指示器 */
+.dots {
+  position: fixed; right: 22px; top: 50%; transform: translateY(-50%);
+  z-index: 60; display: flex; flex-direction: column; gap: 12px;
+}
+.dot {
+  width: 10px; height: 10px; border-radius: 50%; border: none; padding: 0;
+  background: #d1fae5; cursor: pointer; transition: all .25s ease;
+}
+.dot:hover { background: #6ee7b7; }
+.dot.active {
+  background: #10b981; transform: scale(1.4);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, .15);
+}
+
+/* 页面内横向滚动列表（餐食记录 / 运动记录）：与垂直吸附互不干扰 */
+.hscroll { display: flex; gap: 16px; overflow-x: auto; padding-bottom: 10px; }
+.hscroll::-webkit-scrollbar { height: 8px; }
+.hscroll::-webkit-scrollbar-thumb { background: #d1fae5; border-radius: 999px; }
+.hscroll::-webkit-scrollbar-track { background: transparent; }

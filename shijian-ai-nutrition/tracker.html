@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>今日摄入 · 食鉴 AI 营养分析师</title>
+  <meta name="description" content="追踪每日热量预算与三大营养素，查看近 7 天营养周报。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥗</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/scroll.css">
+  <style>
+    /* 今日摄入页少量专属样式 */
+    .week-svg-wrap { background: #fff; border-radius: 20px; box-shadow: var(--shadow); padding: 28px; }
+    .hist-bar { transition: opacity .2s; }
+    .hist-bar:hover { opacity: .75; }
+  </style>
+</head>
+<body>
+
+  <!-- ============ 顶部导航 ============ -->
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a class="logo" href="home.html">
+        <span class="logo-icon">🥗</span>
+        <span class="logo-text">食鉴 <em>AI 营养分析师</em></span>
+      </a>
+      <nav class="nav-links">
+        <a href="home.html">首页</a>
+        <a href="nutrition.html">AI 营养师</a>
+        <a href="chat.html">营养师对话</a>
+        <a href="tracker.html">今日摄入</a>
+        <a href="exercise.html">运动中心</a>
+        <a href="faq.html">常见问题</a>
+      </nav>
+      <div class="nav-user" id="nav-user"></div>
+    </div>
+  </header>
+
+  <!-- ============ 独立吸附滚动容器 ============ -->
+  <main class="page-scroll" id="pageScroll">
+
+    <!-- 区块1：页面标题 Banner -->
+    <section class="snap-block" data-block-name="页面标题">
+      <div class="chat-banner">
+        <img class="banner-deco" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=top-down%20flat%20lay%20of%20broccoli%2C%20green%20apple%2C%20cucumber%20slices%2C%20kiwi%20and%20leafy%20greens%20on%20pale%20mint%20background%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=landscape_16_9" alt="">
+        <h1>📈 今日摄入追踪</h1>
+        <p>每分析并记录一餐，进度会实时更新。数据保存在本机 MySQL 数据库，仅关联你自己的账号。</p>
+      </div>
+    </section>
+
+    <!-- 区块2：摄入数据概览卡片组 -->
+    <section class="snap-block" data-block-name="摄入概览">
+      <div class="container">
+        <div class="tracker-card">
+          <div class="tracker-goals">
+            <label>每日热量目标
+              <input type="number" id="goal-input" min="800" max="6000" step="50" value="2000"> kcal
+            </label>
+          </div>
+          <div class="tracker-bar">
+            <div class="tracker-fill" id="tracker-fill"></div>
+            <span class="tracker-text" id="tracker-text">今日已摄入 0 / 2000 kcal</span>
+          </div>
+        </div>
+
+        <div class="home-overview">
+          <div class="ov-card ov-main">
+            <p class="ov-title">今日热量</p>
+            <p class="ov-num"><span id="ov-calorie">0</span><small> / <span id="ov-goal">2000</span> kcal</small></p>
+            <div class="ov-bar"><i id="ov-fill"></i></div>
+            <p class="ov-sync" id="ov-exercise" hidden></p>
+          </div>
+          <div class="ov-card"><p class="ov-title">蛋白质</p><p class="ov-macro" id="ov-protein">0g</p></div>
+          <div class="ov-card"><p class="ov-title">碳水</p><p class="ov-macro" id="ov-carb">0g</p></div>
+          <div class="ov-card"><p class="ov-title">脂肪</p><p class="ov-macro" id="ov-fat">0g</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 区块3：历史餐食记录列表 -->
+    <section class="snap-block" data-block-name="餐食记录">
+      <div class="container">
+        <h2 class="section-title">🍽️ 今天的餐食记录</h2>
+        <p class="section-desc">每一条都来自「AI 分析 → 记入今日摄入」，可单独删除。</p>
+
+        <div class="tracker-card">
+          <div class="tracker-macros" id="tracker-macros">
+            <span>蛋白质 0g</span><span>碳水 0g</span><span>脂肪 0g</span>
+          </div>
+          <ul class="meal-list" id="meal-list">
+            <li class="meal-empty">还没有记录，先去分析一餐吧 👆</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 区块4：营养周报图表 -->
+    <section class="snap-block" data-block-name="营养周报">
+      <div class="container">
+        <h2 class="section-title">📊 营养周报 · 近 7 天</h2>
+        <p class="section-desc">每天实际摄入的热量，直接来自数据库。</p>
+
+        <div class="week-svg-wrap" style="position: relative; overflow: hidden;">
+          <img class="corner-deco tr" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=top-down%20flat%20lay%20of%20fresh%20mint%20leaves%2C%20oats%2C%20almonds%20and%20green%20vegetables%20on%20pale%20linen%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=landscape_16_9" alt="">
+          <img class="corner-deco bl" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=top-down%20flat%20lay%20of%20fresh%20green%20bean%20sprouts%2C%20oat%20grains%2C%20avocado%20and%20leafy%20greens%20on%20pale%20mint%20linen%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=landscape_16_9" alt="">
+          <svg id="week-chart" viewBox="0 0 720 240" class="w-full" style="position: relative; z-index: 1;" role="img" aria-label="近 7 天每日摄入热量柱状图"></svg>
+          <p class="text-center text-[14px] text-gray-500 mt-3" id="week-summary" style="position: relative; z-index: 1;"></p>
+        </div>
+
+        <footer class="footer">
+          <div class="container">
+            <p><strong>🥗 食鉴 · AI 营养分析师</strong> — AI 健康与生活服务主题参赛作品</p>
+            <p class="disclaimer">⚠️ 免责声明：所有营养数据均为估算，仅供参考，不构成医学诊断或治疗建议。</p>
+          </div>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+  <!-- 右侧圆点指示器 -->
+  <nav class="dots" id="dots" aria-label="页面区块导航"></nav>
+
+  <script src="js/auth.js"></script>
+  <script src="js/tracker.js"></script>
+  <script src="js/scroll-ui.js"></script>
+  <script src="js/global-ui.js"></script>
+</body>
+</html>

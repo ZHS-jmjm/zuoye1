@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>运动中心 · 食鉴 AI 营养分析师</title>
+  <meta name="description" content="记录日常活动，热量自动同步到今日营养概览">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥗</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/scroll.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* ---------- 运动中心页面专属样式（Tailwind 之外的少量补充） ---------- */
+    .lift { transition: transform .2s ease, box-shadow .2s ease; }
+    .lift:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(16, 185, 129, .16); }
+
+    .qtab {
+      padding: 8px 20px; border-radius: 999px; font-size: 14px; font-weight: 600;
+      border: 1.5px solid #e5e7eb; background: #fff; color: #6b7280; cursor: pointer;
+      transition: all .2s; font-family: inherit;
+    }
+    .qtab.active { background: #10b981; border-color: #10b981; color: #fff; }
+    .qtab:not(.active):hover { border-color: #10b981; color: #059669; }
+
+    .qtag {
+      padding: 9px 18px; border-radius: 12px; font-size: 14px; cursor: pointer;
+      background: #ecfdf5; color: #047857; border: 1px solid #d1fae5;
+      transition: all .2s; font-family: inherit;
+    }
+    .qtag:hover { background: #d1fae5; transform: translateY(-2px); }
+
+    .toast {
+      position: fixed; left: 50%; bottom: 36px; transform: translateX(-50%) translateY(20px);
+      background: #1f2937; color: #fff; font-size: 14px; padding: 11px 22px;
+      border-radius: 999px; opacity: 0; pointer-events: none;
+      transition: opacity .3s, transform .3s; z-index: 60; box-shadow: 0 8px 24px rgba(0,0,0,.18);
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* 虚拟食灵挂件（占位） */
+    .pet-slot {
+      position: absolute; right: 28px; bottom: 24px; width: 64px; height: 64px;
+      border-radius: 50%; background: rgba(255,255,255,.55); backdrop-filter: blur(4px);
+      border: 2px dashed rgba(4, 120, 87, .35); display: flex; align-items: center;
+      justify-content: center; font-size: 26px; cursor: default;
+    }
+  </style>
+</head>
+<body class="bg-[#f8faf9]">
+
+  <!-- ============ 顶部导航（固定） ============ -->
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a class="logo" href="home.html">
+        <span class="logo-icon">🥗</span>
+        <span class="logo-text">食鉴 <em>AI 营养分析师</em></span>
+      </a>
+      <nav class="nav-links">
+        <a href="home.html">首页</a>
+        <a href="nutrition.html">AI 营养师</a>
+        <a href="chat.html">营养师对话</a>
+        <a href="tracker.html">今日摄入</a>
+        <a href="exercise.html">运动中心</a>
+        <a href="faq.html">常见问题</a>
+      </nav>
+      <div class="nav-user" id="nav-user"></div>
+    </div>
+  </header>
+
+  <!-- ============ 独立吸附滚动容器 ============ -->
+  <main class="page-scroll" id="pageScroll">
+
+    <!-- 区块1：头部 Banner + 添加运动记录按钮 -->
+    <section class="snap-block" data-block-name="运动中心首页" style="padding: 32px 24px 0;">
+      <div class="max-w-6xl mx-auto relative rounded-[28px] overflow-hidden"
+           style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 55%, #a7f3d0 100%);">
+        <img class="banner-deco" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=sunlit%20park%20grass%20with%20a%20yoga%20mat%2C%20walking%20shoes%20and%20a%20water%20bottle%2C%20soft%20morning%20light%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=landscape_16_9" alt="">
+        <div class="grid grid-cols-[1fr_300px] items-center gap-8 px-12 py-10 relative z-10">
+          <!-- 左：标题 -->
+          <div>
+            <h1 class="text-[34px] font-bold text-gray-800 mb-3">运动中心</h1>
+            <p class="text-[15px] text-gray-500">记录日常活动，热量自动同步到今日营养概览</p>
+            <div class="flex justify-center mt-8">
+              <button id="add-btn" class="btn btn-primary">＋ 添加一条运动记录</button>
+            </div>
+          </div>
+          <!-- 右：今日运动消耗卡片 -->
+          <div class="bg-white/80 backdrop-blur rounded-2xl shadow-sm border border-[#d1fae5] px-6 py-5 text-center">
+            <p class="text-[13px] text-gray-500 mb-1">今日运动消耗</p>
+            <p class="text-[36px] font-bold leading-none" style="color:#059669;">
+              <span id="bn-burn">0</span><span class="text-[15px] font-semibold text-gray-400"> kcal</span>
+            </p>
+            <p class="text-[12px] text-gray-400 mt-2">≈ 一份番茄炒蛋盖饭的一半，很棒 ✨</p>
+          </div>
+        </div>
+        <!-- 虚拟食灵挂件占位（暂不实现动画） -->
+        <div class="pet-slot" title="虚拟食灵 · 敬请期待">🥗</div>
+      </div>
+    </section>
+
+    <!-- 区块2：今日运动概览卡片 -->
+    <section class="snap-block" data-block-name="运动概览" style="padding: 40px 24px 0;">
+      <div class="max-w-6xl mx-auto">
+        <div class="grid grid-cols-4 gap-4">
+          <div class="ov-card lift">
+            <p class="ov-title">🏃 今日运动时长</p>
+            <p class="ov-num"><span id="ov-min">0</span><small> 分钟</small></p>
+            <p class="ov-sync">相当于一节体育课的时间</p>
+          </div>
+          <div class="ov-card lift">
+            <p class="ov-title">🔥 运动消耗</p>
+            <p class="ov-num"><span id="ov-burn">0</span><small> kcal</small></p>
+            <p class="ov-sync">已同步到今日热量额度</p>
+          </div>
+          <div class="ov-card lift">
+            <p class="ov-title">📊 今日活动次数</p>
+            <p class="ov-num"><span id="ov-count">0</span><small> 次</small></p>
+            <p class="ov-sync">碎片时间动一动也很有效</p>
+          </div>
+          <div class="ov-card lift">
+            <p class="ov-title">✅ 本周目标完成进度</p>
+            <p class="ov-num"><span id="ov-weekpct">0</span><small> %</small></p>
+            <div class="ov-bar"><i id="ov-weekfill"></i></div>
+            <p class="ov-sync" id="ov-weeknote">本周目标：舒展 5 天</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 区块3：今日运动记录 + 轻运动推荐 -->
+    <section class="snap-block" data-block-name="运动记录与推荐" style="padding: 48px 24px 0;">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="section-title">📝 今日运动记录</h2>
+        <p class="section-desc">横向滑动查看，点击卡片可以删除这一条。</p>
+
+        <!-- 有记录 -->
+        <div id="rec-list" class="hscroll"></div>
+
+        <!-- 无记录占位 -->
+        <div id="rec-empty" hidden class="rounded-2xl border-2 border-dashed border-[#d1fae5] bg-white/70 py-12 text-center">
+          <div class="text-[52px] leading-none mb-3">🚶‍♀️🌿</div>
+          <p class="text-[15px] text-gray-500">还没有运动记录，饭后散散步也是很棒的活动。</p>
+          <p class="text-[13px] text-gray-400 mt-1">从下面的「快速选择运动」里点一个试试～</p>
+        </div>
+
+        <h2 class="section-title" style="margin-top: 48px;">💡 适配你今日饮食的轻运动推荐</h2>
+        <p class="section-desc">点击卡片即可按预估时长快速记录。</p>
+
+        <div class="grid grid-cols-2 gap-5">
+          <div class="bg-white rounded-2xl shadow-sm overflow-hidden flex lift cursor-pointer" data-add="饭后散步" data-icon="🚶" data-min="20" data-rate="3.3">
+            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=soft%20minimal%20flat%20illustration%2C%20young%20person%20taking%20a%20relaxed%20walk%20in%20a%20green%20park%20after%20dinner%2C%20mint%20green%20and%20cream%20pastel%20palette%2C%20rounded%20soft%20shapes%2C%20cozy%20calm%20lifestyle%2C%20clean%20light%20background&image_size=landscape_4_3" alt="饭后散步" class="w-[220px] h-[150px] object-cover">
+            <div class="p-5 flex-1">
+              <div class="flex items-center gap-2 mb-1.5">
+                <strong class="text-[16px] text-gray-800">🚶 饭后散步</strong>
+                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full" style="background:#ecfdf5;color:#059669;">低</span>
+              </div>
+              <p class="text-[13px] text-gray-500 mb-2">预估时长 20-30 分钟 · 约 70-100 kcal</p>
+              <p class="text-[13px] text-gray-400">帮餐后血糖更平稳，小区里走两圈就好。</p>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-sm overflow-hidden flex lift cursor-pointer" data-add="居家拉伸" data-icon="🧘" data-min="15" data-rate="2.6">
+            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=soft%20minimal%20flat%20illustration%2C%20person%20doing%20gentle%20full%20body%20stretching%20at%20home%20in%20a%20bright%20living%20room%2C%20mint%20green%20pastel%20palette%2C%20rounded%20soft%20shapes%2C%20calm%20cozy%20mood%2C%20clean%20light%20background&image_size=landscape_4_3" alt="居家拉伸" class="w-[220px] h-[150px] object-cover">
+            <div class="p-5 flex-1">
+              <div class="flex items-center gap-2 mb-1.5">
+                <strong class="text-[16px] text-gray-800">🧘 居家拉伸</strong>
+                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full" style="background:#ecfdf5;color:#059669;">低</span>
+              </div>
+              <p class="text-[13px] text-gray-500 mb-2">预估时长 10-15 分钟 · 约 30-40 kcal</p>
+              <p class="text-[13px] text-gray-400">肩颈腰背都松一松，久坐学习后来一组。</p>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-sm overflow-hidden flex lift cursor-pointer" data-add="瑜伽" data-icon="🕉️" data-min="30" data-rate="2.7">
+            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=soft%20minimal%20flat%20illustration%2C%20woman%20holding%20a%20gentle%20yoga%20pose%20on%20a%20mat%20in%20a%20bright%20airy%20room%2C%20mint%20green%20and%20cream%20pastel%20palette%2C%20rounded%20soft%20shapes%2C%20serene%20peaceful%20mood&image_size=landscape_4_3" alt="瑜伽" class="w-[220px] h-[150px] object-cover">
+            <div class="p-5 flex-1">
+              <div class="flex items-center gap-2 mb-1.5">
+                <strong class="text-[16px] text-gray-800">🕉️ 瑜伽</strong>
+                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full" style="background:#fef3c7;color:#b45309;">中等</span>
+              </div>
+              <p class="text-[13px] text-gray-500 mb-2">预估时长 20-30 分钟 · 约 55-80 kcal</p>
+              <p class="text-[13px] text-gray-400">慢慢呼吸慢慢做，睡前来一组更放松。</p>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-sm overflow-hidden flex lift cursor-pointer" data-add="慢骑" data-icon="🚲" data-min="40" data-rate="4">
+            <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=soft%20minimal%20flat%20illustration%2C%20person%20riding%20a%20bicycle%20slowly%20along%20a%20riverside%20path%20with%20trees%2C%20mint%20green%20pastel%20palette%2C%20rounded%20soft%20shapes%2C%20peaceful%20sunny%20mood&image_size=landscape_4_3" alt="慢骑" class="w-[220px] h-[150px] object-cover">
+            <div class="p-5 flex-1">
+              <div class="flex items-center gap-2 mb-1.5">
+                <strong class="text-[16px] text-gray-800">🚲 慢骑</strong>
+                <span class="text-[11px] font-semibold px-2 py-0.5 rounded-full" style="background:#fef3c7;color:#b45309;">中等</span>
+              </div>
+              <p class="text-[13px] text-gray-500 mb-2">预估时长 30-40 分钟 · 约 120-160 kcal</p>
+              <p class="text-[13px] text-gray-400">河边绿道骑一圈，轻松又有活力。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 区块4：快捷运动分类 + 本周运动折线图 -->
+    <section class="snap-block" data-block-name="快捷分类与周报" style="padding: 48px 24px 16px;">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="section-title">快速选择运动</h2>
+        <p class="section-desc">选个分类，点一下就记好了，热量自动帮你算。</p>
+
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+          <div class="flex gap-3 mb-5" id="qtabs"></div>
+          <div class="flex flex-wrap gap-3" id="qtags"></div>
+        </div>
+
+        <h2 class="section-title" style="margin-top: 48px;">📈 本周运动统计</h2>
+        <p class="section-desc">周一到周日，每天的运动消耗都在这里。</p>
+
+        <div class="bg-white rounded-2xl shadow-sm p-8 relative overflow-hidden">
+          <img class="corner-deco tr" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=top-down%20flat%20lay%20of%20fresh%20mint%20leaves%2C%20oats%2C%20almonds%20and%20green%20vegetables%20on%20pale%20linen%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=landscape_16_9" alt="">
+          <svg id="week-chart" viewBox="0 0 720 250" class="w-full relative z-10" role="img" aria-label="本周每日运动消耗折线图"></svg>
+          <p class="text-center text-[14px] text-gray-500 mt-4 relative z-10" id="week-summary"></p>
+        </div>
+
+        <footer class="footer">
+          <div class="container">
+            <p><strong>🥗 食鉴 · AI 营养分析师</strong> — AI 健康与生活服务主题参赛作品</p>
+            <p class="disclaimer">⚠️ 免责声明：运动消耗均为估算，仅供参考，不构成医学建议。</p>
+          </div>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+  <!-- 右侧圆点指示器 -->
+  <nav class="dots" id="dots" aria-label="页面区块导航"></nav>
+
+  <!-- ============ 添加运动记录弹窗 ============ -->
+  <div id="ex-modal" hidden class="fixed inset-0 z-50 bg-black/30 flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl w-full max-w-[380px] p-7">
+      <h3 class="text-[18px] font-bold text-gray-800 mb-4">＋ 添加一条运动记录</h3>
+      <label class="block mb-4">
+        <span class="block text-[13px] text-gray-500 mb-1.5 font-semibold">运动项目</span>
+        <select id="ex-select" class="w-full px-3 py-2.5 border-[1.5px] border-gray-200 rounded-[10px] text-[14px] outline-none focus:border-[#10b981] bg-white"></select>
+      </label>
+      <label class="block mb-4">
+        <span class="block text-[13px] text-gray-500 mb-1.5 font-semibold">时长（分钟）</span>
+        <input type="number" id="ex-min" min="1" max="600" value="30"
+               class="w-full px-3 py-2.5 border-[1.5px] border-gray-200 rounded-[10px] text-[14px] outline-none focus:border-[#10b981]">
+      </label>
+      <p class="text-[13px] text-gray-400 mb-5">预计消耗：<b id="ex-kcal" style="color:#059669;">0</b> kcal</p>
+      <div class="flex gap-3">
+        <button id="ex-cancel" class="flex-1 py-2.5 rounded-xl border-[1.5px] border-gray-200 text-gray-500 text-[14px] font-semibold hover:border-gray-300 transition">取消</button>
+        <button id="ex-save" class="flex-1 py-2.5 rounded-xl text-white text-[14px] font-semibold transition" style="background:#10b981;">记下来</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="js/auth.js"></script>
+  <script>
+    Auth.requireLogin();          // 未登录自动跳回登录页
+    Auth.mountNavUser(document.getElementById("nav-user"));
+  </script>
+  <script src="js/exercise.js"></script>
+  <script src="js/scroll-ui.js"></script>
+  <script src="js/global-ui.js"></script>
+</body>
+</html>

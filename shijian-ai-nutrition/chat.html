@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>营养师对话 · 食鉴 AI 营养分析师</title>
+  <meta name="description" content="AI 营养师记得你今天的摄入情况，一对一给出贴心的饮食建议。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥗</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/scroll.css">
+</head>
+<body>
+
+  <!-- ============ 顶部导航 ============ -->
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a class="logo" href="home.html">
+        <span class="logo-icon">🥗</span>
+        <span class="logo-text">食鉴 <em>AI 营养分析师</em></span>
+      </a>
+      <nav class="nav-links">
+        <a href="home.html">首页</a>
+        <a href="nutrition.html">AI 营养师</a>
+        <a href="chat.html">营养师对话</a>
+        <a href="tracker.html">今日摄入</a>
+        <a href="exercise.html">运动中心</a>
+        <a href="faq.html">常见问题</a>
+      </nav>
+      <div class="nav-user" id="nav-user"></div>
+    </div>
+  </header>
+
+  <!-- ============ 独立吸附滚动容器 ============ -->
+  <main class="page-scroll" id="pageScroll">
+
+    <!-- 区块1：标题 Banner -->
+    <section class="snap-block" data-block-name="对话页首页">
+      <div class="chat-banner">
+        <img class="banner-deco" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=top-down%20flat%20lay%20of%20fresh%20green%20bean%20sprouts%2C%20oat%20grains%2C%20avocado%20and%20leafy%20greens%20on%20pale%20mint%20linen%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=landscape_16_9" alt="">
+        <h1>💬 AI 营养师 · 一对一对话</h1>
+        <p>TA 记得你今天的摄入情况，可以问：今天还剩多少热量预算？晚上健身前吃什么？</p>
+      </div>
+    </section>
+
+    <!-- 区块2：聊天消息区 -->
+    <section class="snap-block" data-block-name="聊天消息">
+      <div class="container">
+        <div class="chat-window chat-window-tall">
+          <div class="chat-messages" id="chat-messages">
+            <div class="msg msg-ai">你好呀！我是你的 AI 营养师 🥑<br>
+              分析完一餐后，我可以结合你今天已摄入的热量给出更具体的建议——比如“晚餐还剩 600 kcal 预算，推荐这样吃”。</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 区块3：输入框与快捷话术 -->
+    <section class="snap-block" data-block-name="输入与快捷话术">
+      <div class="container">
+        <div class="chat-window chat-input-only">
+          <div class="chat-input-row">
+            <input type="text" id="chat-input" placeholder="输入你的问题…" maxlength="300">
+            <button class="btn btn-primary" id="chat-send">发送</button>
+          </div>
+        </div>
+
+        <h2 class="section-title">快捷话术 · 点一下直接问</h2>
+        <div class="quick-grid">
+          <button class="chat-quick" data-q="今天还剩多少热量预算？"><img class="mini-thumb" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20small%20fresh%20green%20salad%20bowl%20on%20a%20mint%20background%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=square" alt="沙拉">今天还剩多少热量预算？</button>
+          <button class="chat-quick" data-q="晚上健身前吃什么？"><img class="mini-thumb" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20bowl%20of%20whole%20grain%20oat%20cereal%20with%20nuts%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=square" alt="谷物">晚上健身前吃什么？</button>
+          <button class="chat-quick" data-q="我这样吃营养均衡吗？"><img class="mini-thumb" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=green%20apple%2C%20kiwi%20and%20grapes%20on%20a%20mint%20plate%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=square" alt="水果">我这样吃营养均衡吗？</button>
+          <button class="chat-quick" data-q="推荐一个 300 kcal 以内的晚餐"><img class="mini-thumb" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20glass%20of%20water%20with%20mint%20leaf%20and%20lemon%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=square" alt="水杯">推荐一个 300 kcal 以内的晚餐</button>
+        </div>
+
+        <footer class="footer">
+          <div class="container">
+            <p><strong>🥗 食鉴 · AI 营养分析师</strong> — AI 健康与生活服务主题参赛作品</p>
+            <p class="disclaimer">⚠️ 免责声明：AI 建议仅供参考，不构成医学诊断或治疗建议。</p>
+          </div>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+  <!-- 右侧圆点指示器 -->
+  <nav class="dots" id="dots" aria-label="页面区块导航"></nav>
+
+  <script src="js/ai-api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    Auth.requireLogin();
+    Auth.mountNavUser(document.getElementById("nav-user"));
+  </script>
+  <script src="js/chat.js"></script>
+  <script src="js/scroll-ui.js"></script>
+  <script src="js/global-ui.js"></script>
+</body>
+</html>

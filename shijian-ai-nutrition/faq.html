@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>常见问题 · 食鉴 AI 营养分析师</title>
+  <meta name="description" content="食鉴常见问题：估算准确性、隐私、中餐识别、AI 接入方式">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥗</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/scroll.css">
+</head>
+<body>
+
+  <!-- ============ 顶部导航（固定） ============ -->
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a class="logo" href="home.html">
+        <span class="logo-icon">🥗</span>
+        <span class="logo-text">食鉴 <em>AI 营养分析师</em></span>
+      </a>
+      <nav class="nav-links">
+        <a href="home.html">首页</a>
+        <a href="nutrition.html">AI 营养师</a>
+        <a href="chat.html">营养师对话</a>
+        <a href="tracker.html">今日摄入</a>
+        <a href="exercise.html">运动中心</a>
+        <a href="faq.html">常见问题</a>
+      </nav>
+      <div class="nav-user" id="nav-user"></div>
+    </div>
+  </header>
+
+  <!-- ============ 独立吸附滚动容器 ============ -->
+  <main class="page-scroll" id="pageScroll">
+
+    <!-- 区块1：标题 Banner -->
+    <section class="snap-block" data-block-name="常见问题首页">
+      <div class="chat-banner">
+        <img class="banner-deco" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=top-down%20flat%20lay%20of%20fresh%20mint%20leaves%2C%20oats%2C%20almonds%20and%20green%20vegetables%20on%20pale%20linen%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=landscape_16_9" alt="">
+        <h1>❓ 常见问题</h1>
+        <p>关于估算准确性、数据隐私和 AI 接入，你想知道的都在这里。</p>
+      </div>
+    </section>
+
+    <!-- 区块2：FAQ 列表 + 页脚 -->
+    <section class="snap-block" data-block-name="FAQ列表">
+      <div class="container" style="padding-bottom: 24px; position: relative; overflow: hidden;">
+        <img class="corner-deco tr" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=top-down%20flat%20lay%20of%20broccoli%2C%20green%20apple%2C%20cucumber%20slices%2C%20kiwi%20and%20leafy%20greens%20on%20pale%20mint%20background%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=landscape_16_9" alt="">
+        <img class="corner-deco bl" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=top-down%20flat%20lay%20of%20fresh%20mint%20leaves%2C%20oats%2C%20almonds%20and%20green%20vegetables%20on%20pale%20linen%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=landscape_16_9" alt="">
+        <div class="faq-list" style="position: relative; z-index: 1;">
+          <details>
+            <summary>热量估算准确吗？</summary>
+            <p>基于 AI 视觉识别与食物营养数据库的估算，典型误差在 ±10~20%。描述越具体（如“200g 鸡胸肉”）结果越准。估算仅供参考，不构成医疗建议。</p>
+          </details>
+          <details>
+            <summary>我的照片会被上传保存吗？</summary>
+            <p>照片仅在调用 AI 分析接口时发送。你的饮食记录保存在本机 MySQL 数据库（shijian_nutrition）中，仅关联你自己的账号，不对外提供。</p>
+          </details>
+          <details>
+            <summary>支持识别中餐吗？</summary>
+            <p>支持。家常菜、外卖、火锅、奶茶等常见中式食物与饮品都在识别范围内，也支持混合菜品（如麻辣香锅）的成分拆解。</p>
+          </details>
+          <details>
+            <summary>怎么接入自己的 AI？</summary>
+            <p>本站已接入 DeepSeek（<code>deepseek-flash</code>），文字分析、营养师对话、拍照识别全部由它处理，一个 Key 通用。API Key 安全地保存在服务器端环境变量（<code>server/.env</code>）里，由后端统一调用 AI 接口，前端代码和浏览器中不存在任何密钥；如需更换 Key 或模型，由管理员修改服务器配置即可。</p>
+          </details>
+          <details>
+            <summary>运动消耗是怎么算的？</summary>
+            <p>按活动的代谢当量（MET）与时长估算，比如饭后散步 30 分钟约 100 kcal。消耗会自动同步到「今日摄入」和首页的热量额度里。</p>
+          </details>
+        </div>
+
+        <footer class="footer">
+          <div class="container">
+            <div class="faq-icons">
+              <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20small%20fresh%20green%20salad%20bowl%20on%20a%20mint%20background%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=square" alt="餐盘">
+              <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=a%20glass%20of%20water%20with%20mint%20leaf%20and%20lemon%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=square" alt="水杯">
+              <img src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=green%20apple%2C%20kiwi%20and%20grapes%20on%20a%20mint%20plate%2C%20soft%20natural%20daylight%2C%20low%20saturation%20pastel%20mint%20green%20tones%2C%20gentle%20film%20grain%2C%20clean%20minimal%2C%20fresh%20healing%20lifestyle&image_size=square" alt="果蔬">
+            </div>
+            <p><strong>🥗 食鉴 · AI 营养分析师</strong> — AI 健康与生活服务主题参赛作品</p>
+            <p class="disclaimer">⚠️ 免责声明：本站所有营养分析均为 AI 估算，仅供参考，不构成医学诊断或治疗建议。如有特殊健康状况，请咨询专业医生或注册营养师。</p>
+          </div>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+  <!-- 右侧圆点指示器 -->
+  <nav class="dots" id="dots" aria-label="页面区块导航"></nav>
+
+  <script src="js/auth.js"></script>
+  <script>
+    Auth.requireLogin();
+    Auth.mountNavUser(document.getElementById("nav-user"));
+  </script>
+  <script src="js/scroll-ui.js"></script>
+  <script src="js/global-ui.js"></script>
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>食鉴 · AI 营养分析师 — 拍一拍，就知道这餐吃了什么</title>
+  <meta name="description" content="AI 营养分析师：上传食物照片或用文字描述一餐，AI 即刻识别食物、估算卡路里与三大营养素，并给出健康评分与个性化饮食建议。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🥗</text></svg>">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/scroll.css">
+  <style>
+    /* AI 分析记录卡片（区块4） */
+    .hist-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .hist-card {
+      background: #fff; border: 1px solid var(--line); border-radius: 16px;
+      box-shadow: var(--shadow); padding: 14px 16px;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .hist-card:hover { transform: translateY(-4px); box-shadow: 0 12px 28px rgba(16,185,129,.16); }
+    .hist-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+    .hist-top b {
+      font-size: 14px; color: var(--ink); overflow: hidden; text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .hist-score {
+      flex: none; font-weight: 700; font-size: 13px; color: var(--green-600);
+      background: #ecfdf5; border-radius: 999px; padding: 3px 10px;
+    }
+    .hist-kcal { font-size: 12px; color: var(--ink-2); margin-top: 8px; }
+    .hist-time { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+    .hist-empty { color: var(--ink-2); font-size: 14px; text-align: center; padding: 24px 0; }
+    /* 快捷提问推荐卡片 */
+    .quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    .quick-chip-card {
+      background: #fff; border: 1.5px solid #d1fae5; border-radius: 14px;
+      padding: 14px 16px; font-size: 14px; color: #047857; cursor: pointer;
+      font-family: inherit; text-align: left; transition: all .2s;
+    }
+    .quick-chip-card:hover { background: #ecfdf5; transform: translateY(-3px); border-color: #10b981; }
+    @media (max-width: 1100px) { .hist-grid, .quick-grid { grid-template-columns: repeat(2, 1fr); } }
+  </style>
+</head>
+<body>
+
+  <!-- ============ 顶部导航（固定） ============ -->
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a class="logo" href="home.html">
+        <span class="logo-icon">🥗</span>
+        <span class="logo-text">食鉴 <em>AI 营养分析师</em></span>
+      </a>
+      <nav class="nav-links">
+        <a href="home.html">首页</a>
+        <a href="#analyzer">AI 分析</a>
+        <a href="chat.html">营养师对话</a>
+        <a href="tracker.html">今日摄入</a>
+        <a href="exercise.html">运动中心</a>
+        <a href="faq.html">常见问题</a>
+      </nav>
+      <div class="nav-user" id="nav-user"></div>
+    </div>
+  </header>
+
+  <!-- ============ 独立吸附滚动容器 ============ -->
+  <main id="top">
+  <div class="page-scroll" id="pageScroll">
+
+    <!-- 区块1：标题 Banner -->
+    <section class="snap-block hero" data-block-name="AI营养师首页">
+      <div class="container hero-inner">
+        <div class="hero-copy">
+          <p class="hero-badge">🏆 网页开发比赛参赛作品 · AI 健康与生活服务</p>
+          <h1>拍一拍，<span class="grad">3 秒看懂</span>这一餐的营养</h1>
+          <p class="hero-sub">
+            上传食物照片或用一句话描述你的餐食，AI 营养分析师即刻识别食物、
+            估算卡路里与蛋白质 / 碳水 / 脂肪，给出健康评分和吃得更好的建议。
+          </p>
+          <div class="hero-cta">
+            <a href="#analyzer" class="btn btn-primary">立即分析我的餐食</a>
+            <a href="chat.html" class="btn btn-ghost">问问 AI 营养师</a>
+          </div>
+          <div class="hero-stats">
+            <div><strong>1,000+</strong><span>可识别食物</span></div>
+            <div><strong>5 项</strong><span>核心营养指标</span></div>
+            <div><strong>0 注册</strong><span>打开即用</span></div>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <img src="image/hero-salad.jpg" class="hv-main" alt="营养均衡的彩虹沙拉碗">
+          <img src="image/chicken-meal.jpg" class="hv-sub" alt="高蛋白健身餐碗">
+          <div class="hv-float">
+            <span class="hv-score">86</span>
+            <span class="hv-float-text"><strong>健康评分</strong><small>营养均衡 · 高蛋白</small></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 区块2：识别场景 -->
+    <section class="snap-block scenes" data-block-name="识别场景">
+      <div class="container">
+        <h2 class="section-title">什么都能识别</h2>
+        <p class="section-desc">从家常菜到奶茶甜品，AI 都认识——中餐、饮品、面食、轻食，一张照片就够。</p>
+        <div class="scene-grid">
+          <figure class="scene-card">
+            <img src="image/dumplings.jpg" alt="一盘饺子" loading="lazy">
+            <figcaption><strong>家常菜</strong><span>饺子 · 炒菜 · 盖饭</span></figcaption>
+          </figure>
+          <figure class="scene-card">
+            <img src="image/drink.jpg" alt="草莓特调饮品" loading="lazy">
+            <figcaption><strong>奶茶饮品</strong><span>含糖量 · 热量提醒</span></figcaption>
+          </figure>
+          <figure class="scene-card">
+            <img src="image/noodles.jpg" alt="虾仁鸡蛋拉面" loading="lazy">
+            <figcaption><strong>面食汤粉</strong><span>主食分量 · 汤底钠含量</span></figcaption>
+          </figure>
+          <figure class="scene-card">
+            <img src="image/veggies.jpg" alt="丰富的蔬菜食材拼盘" loading="lazy">
+            <figcaption><strong>轻食沙拉</strong><span>纤维 · 好油脂来源</span></figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- 区块3：对话输入区（AI 分析） -->
+    <section id="analyzer" class="snap-block section" data-block-name="分析输入">
+      <div class="container">
+        <h2 class="section-title">AI 食物分析</h2>
+        <p class="section-desc">两种方式任选：上传一张餐食照片，或者用文字告诉我们你吃了什么。</p>
+
+        <div class="analyzer-card">
+          <!-- 输入方式切换 -->
+          <div class="tabs" role="tablist">
+            <button class="tab active" data-tab="image" role="tab">📷 图片识别</button>
+            <button class="tab" data-tab="text" role="tab">✏️ 文字描述</button>
+          </div>
+
+          <!-- 图片上传面板 -->
+          <div class="tab-panel active" id="panel-image">
+            <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="上传食物照片">
+              <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" hidden>
+              <div class="dz-empty" id="dz-empty">
+                <div class="dz-icon">🍽️</div>
+                <p class="dz-main">拖拽 / 粘贴 (Ctrl+V) / 点击上传食物照片</p>
+                <p class="dz-hint">支持 JPG · PNG · WebP，最大 10MB，光线充足、整盘可见时识别更准</p>
+              </div>
+              <img id="preview-img" class="dz-preview" alt="食物照片预览" hidden>
+            </div>
+          </div>
+
+          <!-- 文字描述面板 -->
+          <div class="tab-panel" id="panel-text">
+            <textarea id="food-text" rows="3" maxlength="500"
+              placeholder="例如：一碗牛肉面（约 300g），加了一个卤蛋和一把小青菜，喝了半杯豆浆"></textarea>
+            <div class="quick-chips">
+              <span>试试：</span>
+              <button class="chip">一份番茄炒蛋盖饭</button>
+              <button class="chip">大杯全糖珍珠奶茶</button>
+              <button class="chip">两个韭菜盒子</button>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-block" id="analyze-btn">
+            <span class="btn-label">开始 AI 分析</span>
+            <span class="btn-loading" hidden><span class="spinner"></span> AI 正在识别食物…</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 区块3b：分析报告（分析后出现，独立吸附单元） -->
+    <section class="snap-block section" data-block-name="分析报告" style="padding-top: 24px;">
+      <div class="container">
+        <!-- 分析结果 -->
+        <div id="result" class="result" hidden>
+          <div class="result-head">
+            <h3>📊 分析报告 <span class="demo-chip" id="demo-chip" hidden>演示数据</span></h3>
+            <button class="btn btn-ghost btn-sm" id="add-to-today">＋ 记入今日摄入</button>
+          </div>
+
+          <div class="result-grid">
+            <!-- 健康评分环 -->
+            <div class="result-card score-card">
+              <p class="rc-title">健康评分</p>
+              <svg class="score-ring" viewBox="0 0 120 120" aria-hidden="true">
+                <circle class="ring-bg" cx="60" cy="60" r="50"/>
+                <circle class="ring-fg" id="score-arc" cx="60" cy="60" r="50"/>
+              </svg>
+              <p class="score-num"><span id="score-value">0</span><small>/100</small></p>
+              <p class="score-label" id="score-label">—</p>
+            </div>
+
+            <!-- 卡路里 -->
+            <div class="result-card calorie-card">
+              <p class="rc-title">预估热量</p>
+              <p class="calorie-num"><span id="calorie-value">0</span><small> kcal</small></p>
+              <p class="rc-note" id="calorie-note">—</p>
+            </div>
+
+            <!-- 三大营养素 -->
+            <div class="result-card macro-card">
+              <p class="rc-title">三大营养素</p>
+              <div class="macro-row">
+                <span class="macro-name">蛋白质</span>
+                <div class="macro-bar"><i id="bar-protein" class="c-protein"></i></div>
+                <span class="macro-val" id="val-protein">—</span>
+              </div>
+              <div class="macro-row">
+                <span class="macro-name">碳水</span>
+                <div class="macro-bar"><i id="bar-carb" class="c-carb"></i></div>
+                <span class="macro-val" id="val-carb">—</span>
+              </div>
+              <div class="macro-row">
+                <span class="macro-name">脂肪</span>
+                <div class="macro-bar"><i id="bar-fat" class="c-fat"></i></div>
+                <span class="macro-val" id="val-fat">—</span>
+              </div>
+              <div class="macro-row">
+                <span class="macro-name">膳食纤维</span>
+                <div class="macro-bar"><i id="bar-fiber" class="c-fiber"></i></div>
+                <span class="macro-val" id="val-fiber">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 识别到的食物 -->
+          <div class="result-card foods-card">
+            <p class="rc-title">识别到的食物</p>
+            <ul class="food-list" id="food-list"></ul>
+          </div>
+
+          <!-- AI 点评 -->
+          <div class="result-card comment-card">
+            <p class="rc-title">💬 AI 营养师点评</p>
+            <p class="ai-comment" id="ai-comment">—</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 区块4：AI 问答记录区 -->
+    <section class="snap-block section" data-block-name="AI分析记录">
+      <div class="container">
+        <h2 class="section-title">🗂️ AI 分析记录</h2>
+        <p class="section-desc">你分析过的每一餐都会留档（MySQL），随时回看历史报告。</p>
+        <div class="hist-grid" id="history-list">
+          <p class="hist-empty">正在加载分析记录…</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 区块5：快捷提问推荐卡片 + FAQ + 页脚 -->
+    <section class="snap-block section section-alt" data-block-name="快捷提问推荐">
+      <div class="container">
+        <h2 class="section-title">💡 快捷提问推荐</h2>
+        <p class="section-desc">点一下自动填入文字描述框，马上开始分析。</p>
+        <div class="quick-grid" id="quick-examples">
+          <button class="quick-chip-card">🍚 一份番茄炒蛋盖饭</button>
+          <button class="quick-chip-card">🧋 大杯全糖珍珠奶茶</button>
+          <button class="quick-chip-card">🥟 两个韭菜盒子</button>
+          <button class="quick-chip-card">🍜 一碗牛肉面（约300g）加卤蛋</button>
+        </div>
+
+        <footer class="footer">
+          <div class="container">
+            <p><strong>🥗 食鉴 · AI 营养分析师</strong> — AI 健康与生活服务主题参赛作品</p>
+            <p class="disclaimer">⚠️ 免责声明：本站所有营养分析均为 AI 估算，仅供参考，不构成医学诊断或治疗建议。如有特殊健康状况，请咨询专业医生或注册营养师。</p>
+          </div>
+        </footer>
+      </div>
+    </section>
+  </div>
+  </main>
+
+  <!-- 右侧圆点指示器 -->
+  <nav class="dots" id="dots" aria-label="页面区块导航"></nav>
+
+  <script src="js/ai-api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    /* 登录守卫：未登录跳回登录页；已登录在导航栏显示用户名 */
+    Auth.requireLogin();
+    Auth.mountNavUser(document.getElementById("nav-user"));
+  </script>
+  <script src="js/app.js"></script>
+  <script src="js/scroll-ui.js"></script>
+  <script src="js/global-ui.js"></script>
+</body>
+</html>
